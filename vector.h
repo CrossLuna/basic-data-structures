@@ -31,8 +31,6 @@ public:
     contents_(new T[n]),
     size_(n), 
     capacity_(n) {}
-
-
     
     vector(size_type n, value_type value):
     contents_(new T[n]),
@@ -40,9 +38,6 @@ public:
     capacity_(n) {
         std::fill_n(contents_.get(), n, value);
     }
-    
-
-    
 
     /* Copy Constructor*/
     vector(const vector& other): 
@@ -51,9 +46,12 @@ public:
     capacity_(other.capacity_) {}
 
     /* Assign Constructor */
-    //vector& operator=(const vector& other) {
-    //    this.contents_ = 
-    //}
+    vector& operator=(const vector& other) {
+        this->contents_ = copy_array(other.contents_, other.size_);
+        this->size_ = other.size_;
+        this->capacity_ = other.capacity_;
+        return *this;
+    }
 
 
     ~vector() = default;
@@ -68,30 +66,57 @@ public:
     //reverse_iterator       rend() noexcept;
     //const_reverse_iterator rend()    const noexcept;
 
-    const_iterator         cbegin()  const noexcept;
-    const_iterator         cend()    const noexcept;
+    const_iterator         cbegin()  const {return contents_.get();};
+    const_iterator         cend()    const {return contents_.get() + size_;};
     //const_reverse_iterator crbegin() const noexcept;
     //const_reverse_iterator crend()   const noexcept;
 
 
     size_type size() const {return size_;}
+    size_type max_size() const {return std::numeric_limits<difference_type>::max();}
     size_type capacity() const {return capacity_;}
     bool empty() const {return size_ == 0;}
-    size_type max_size() const {return std::numeric_limits<difference_type>::max();}
+    void reserve(size_type n);
+    void shrink_to_fit() noexcept;
 
     reference       operator[] (size_type i) {return contents_[i];}
     const_reference operator[] (size_type i) const {return contents_[i];}
     reference       at(size_type n);
     const_reference at(size_type n) const;
 
-    reference       front();
-    const_reference front() const;
-    reference       back();
-    const_reference back() const;
-
+    reference       front() {return *begin();}
+    const_reference front() const {return *cbegin();}
+    reference       back() {return *(end()-1);}
+    const_reference back() const {return *(cend()-1);}
 
     value_type*       data() {return contents_.get();}
     const value_type* data() const {return contents_.get();}
+
+    void push_back(const value_type& x);
+    template <class... Args> reference emplace_back(Args&&... args);  // C++14; reference in C++17
+    void pop_back();
+
+    template <class... Args> iterator emplace(const_iterator position, Args&&... args);  // C++14
+    iterator insert(const_iterator position, const value_type& x);
+    iterator insert(const_iterator position, size_type n, const value_type& x);
+    template <class InputIterator>
+        iterator insert(const_iterator position, InputIterator first, InputIterator last);
+    //iterator insert(const_iterator position, initializer_list<value_type> il);
+
+    iterator erase(const_iterator position);
+    iterator erase(const_iterator first, const_iterator last);
+
+    void clear() noexcept;
+
+    void resize(size_type sz);
+    void resize(size_type sz, value_type x);
+
+    //void swap(vector&)
+    //    noexcept(allocator_traits<allocator_type>::propagate_on_container_swap::value ||
+    //             allocator_traits<allocator_type>::is_always_equal::value);  // C++17
+    //void flip() noexcept;
+
+    //bool __invariants() const;
 
     
 private:

@@ -28,6 +28,13 @@ TEST_CASE("vectors can be sized and resized", "[vector]") {
     REQUIRE(v.size() == 5);
     REQUIRE(v.capacity() >= 5);
 
+    clstd::vector<int> v_copy(v);
+    REQUIRE(v.size() == v_copy.size());
+
+    clstd::vector<int> v_assign(3);
+    v_assign = v;
+    REQUIRE(v.size() == v_assign.size());
+
     clstd::vector<int> v2(5, 871);
     REQUIRE(v2[0] == 871);
     REQUIRE(*(v2.data() + 1) == 871);
@@ -36,10 +43,13 @@ TEST_CASE("vectors can be sized and resized", "[vector]") {
         sum += *it;
     }
     REQUIRE(sum == 4355);
+    REQUIRE(v2.front() == 871);
+    REQUIRE(v2.back() == 871);
 
     //clstd::vector<Car> vcar(3, Car(466));
     clstd::vector<Car> vcar(3, 466);
     REQUIRE(vcar[1].num == 466);
+
 
     /*
     SECTION( "resizing bigger changes size and capacity" ) {
