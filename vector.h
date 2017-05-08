@@ -1,10 +1,11 @@
 #pragma once
 
 #include <cstddef>
+
+#include <algorithm>
+#include <limits>
 #include <memory>
 #include <stdexcept>
-#include <limits>
-#include <algorithm>
 
 namespace clstd {
 
@@ -41,13 +42,13 @@ public:
 
     /* Copy Constructor*/
     vector(const vector& other): 
-    contents_(copy_array(other.contents_, other.size_)),
+    contents_(copy_array(other.contents_, other.size_, other.size_)),
     size_(other.size_),
     capacity_(other.capacity_) {}
 
     /* Assign Constructor */
     vector& operator=(const vector& other) {
-        this->contents_ = copy_array(other.contents_, other.size_);
+        this->contents_ = copy_array(other.contents_, other.size_, other.size_);
         this->size_ = other.size_;
         this->capacity_ = other.capacity_;
         return *this;
@@ -81,8 +82,8 @@ public:
 
     reference       operator[] (size_type i) {return contents_[i];}
     const_reference operator[] (size_type i) const {return contents_[i];}
-    reference       at(size_type n);
-    const_reference at(size_type n) const;
+    reference       at(size_type n) {if(n >= size_) throw std::out_of_range("Out of range"); return contents_[n];}
+    const_reference at(size_type n) const {if(n >= size_) throw std::out_of_range("Out of range"); return contents_[n];}
 
     reference       front() {return *begin();}
     const_reference front() const {return *cbegin();}
@@ -120,9 +121,9 @@ public:
 
     
 private:
-    std::unique_ptr<T[]> copy_array(const std::unique_ptr<T[]>& orig, std::size_t size) {
+    std::unique_ptr<T[]> copy_array(const std::unique_ptr<T[]>& orig, std::size_t size, std::size_t orig_size) {
         std::unique_ptr<T[]> copy {new T[size]};
-        for(std::size_t i = 0; i < size; ++i) 
+        for(std::size_t i = 0; i < orig_size; ++i) 
             copy[i] = orig[i];
         return copy;
     }
@@ -131,4 +132,15 @@ private:
     std::size_t capacity_ {DEFAULT_MAX_CAP};
     static const std::size_t DEFAULT_MAX_CAP {0u};
 };
+
+template <typename T>
+void vector<T>::push_back(const vector<T>::value_type& x) {
+    if(size_ == capacity_) { // expand
+        capacity_ = std::max(size_ << 1, size_t{1});
+        contents_ = copy_array(contents_, capacity_, size_);
+    }
+    contents_[size_] = x;
+    ++size_;
+}
+
 } //namespace clstd

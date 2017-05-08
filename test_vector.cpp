@@ -50,7 +50,6 @@ TEST_CASE("vectors can be sized and resized", "[vector]") {
     clstd::vector<Car> vcar(3, 466);
     REQUIRE(vcar[1].num == 466);
 
-
     /*
     SECTION( "resizing bigger changes size and capacity" ) {
         v.resize( 10 );
@@ -59,6 +58,22 @@ TEST_CASE("vectors can be sized and resized", "[vector]") {
         REQUIRE( v.capacity() >= 10 );
     }
     */
+}
+
+TEST_CASE("push_back", "[vector]") {
+    clstd::vector<int> v;
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(3);
+    v.push_back(4);
+    v.push_back(5);
+    REQUIRE(v.size() == 5);
+    REQUIRE(v.capacity() >= 5);
+    REQUIRE(v[0] == 1);
+    REQUIRE(v[1] == 2);
+    REQUIRE(v[2] == 3);
+    REQUIRE(v[3] == 4);
+    REQUIRE(v[4] == 5);
 }
 
 TEST_CASE("memory leak", "[vector]") {
