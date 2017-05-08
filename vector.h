@@ -6,6 +6,7 @@
 #include <limits>
 #include <memory>
 #include <stdexcept>
+#include <utility>
 
 namespace clstd {
 
@@ -54,6 +55,18 @@ public:
         return *this;
     }
 
+    /* Move Contructor */
+    vector(vector&& other):
+    contents_(std::move(other.contents_)),
+    size_(other.size_),
+    capacity_(other.capacity_) {}
+
+    /* Move Assign Constructor */
+    vector& operator=(vector&& other) {
+        std::swap(contents_, other.contents_);
+        std::swap(size_, other.size_);
+        std::swap(capacity_, other.capacity_);
+    }
 
     ~vector() = default;
 
@@ -141,6 +154,21 @@ void vector<T>::push_back(const vector<T>::value_type& x) {
     }
     contents_[size_] = x;
     ++size_;
+}
+
+template <typename T>
+void vector<T>::pop_back() {
+    --size_;
+    if((size_ << 2) <= capacity_) { 
+        capacity_ >>= 1;
+    }
+    contents_ = copy_array(contents_, capacity_, size_);
+}
+
+template <typename T>
+void vector<T>::shrink_to_fit() noexcept {
+    capacity_ = size_;
+    contents_ = copy_array(contents_, capacity_, size_);
 }
 
 } //namespace clstd
